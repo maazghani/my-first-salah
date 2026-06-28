@@ -14,6 +14,16 @@ export type SalatStep = {
   sayMeaning: string
   /** A little encouraging tip for kids. */
   funTip: string
+  /** Extra passages that follow the main words (e.g. Darood, final dua). */
+  extraPassages?: SalatPassage[]
+}
+
+export type SalatPassage = {
+  label: string
+  /** When this passage is said, e.g. "Only in the last sitting". */
+  when?: string
+  say: string
+  meaning: string
 }
 
 export const salatSteps: SalatStep[] = [
@@ -106,11 +116,28 @@ export const salatSteps: SalatStep[] = [
     imageAlt:
       'A child sitting on the knees with hands on the thighs and the right index finger gently raised.',
     whatToDo:
-      'Sit calmly on your knees with your hands on your thighs. Gently raise your right index finger as you say the words.',
-    say: 'At-tahiyyatu lillahi was-salawatu wat-tayyibat...',
-    sayMeaning: 'All greetings, prayers and good things belong to Allah...',
+      'Sit calmly on your knees with your hands on your thighs. Gently raise your right index finger when you say "Ashhadu alla ilaha illallah", then lower it again.',
+    say: 'At-tahiyyatu lillahi was-salawatu wat-tayyibat. As-salamu \u02bbalaika ayyuhan-Nabiyyu wa rahmatullahi wa barakatuh. As-salamu \u02bbalaina wa \u02bbala \u02bbibadillahis-salihin. Ashhadu alla ilaha illallah, wa ashhadu anna Muhammadan \u02bbabduhu wa rasuluh.',
+    sayMeaning:
+      'All greetings, prayers and pure words are for Allah. Peace be upon you, O Prophet, and the mercy of Allah and His blessings. Peace be upon us and upon all the righteous servants of Allah. I bear witness that there is no god but Allah, and I bear witness that Muhammad is His servant and Messenger.',
     funTip:
-      'Here we send our love and greetings of peace to Allah and to Prophet Muhammad (peace be upon him).',
+      'This is the whole Tashahhud. Say it gently \u2014 you are sending greetings of peace to Allah, to the Prophet (peace be upon him), and to all good people.',
+    extraPassages: [
+      {
+        label: 'Darood Ibrahim',
+        when: 'In the last sitting, right after the Tashahhud',
+        say: 'Allahumma salli \u02bbala Muhammadin wa \u02bbala ali Muhammad, kama sallaita \u02bbala Ibrahima wa \u02bbala ali Ibrahim, innaka Hamidum Majid. Allahumma barik \u02bbala Muhammadin wa \u02bbala ali Muhammad, kama barakta \u02bbala Ibrahima wa \u02bbala ali Ibrahim, innaka Hamidum Majid.',
+        meaning:
+          'O Allah, send Your grace upon Muhammad and the family of Muhammad, as You sent it upon Ibrahim and the family of Ibrahim; You are truly Praiseworthy, Glorious. O Allah, send Your blessings upon Muhammad and the family of Muhammad, as You blessed Ibrahim and the family of Ibrahim; You are truly Praiseworthy, Glorious.',
+      },
+      {
+        label: 'Rabbi-j\u02bbalni (a beautiful dua)',
+        when: 'In the last sitting, after the Darood',
+        say: 'Rabbi-j\u02bbalni muqimas-salati wa min dhurriyyati, Rabbana wa taqabbal du\u02bba\u02be.',
+        meaning:
+          'My Lord, make me and my children keep up the prayer. Our Lord, and accept my dua.',
+      },
+    ],
   },
   {
     id: 'tasleem',

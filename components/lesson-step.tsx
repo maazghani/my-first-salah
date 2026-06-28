@@ -62,6 +62,30 @@ export function LessonStep({ step }: { step: SalatStep }) {
             <p className="mt-1 text-sm italic leading-relaxed text-muted-foreground">
               {step.sayMeaning}
             </p>
+
+            {step.extraPassages?.map((passage) => (
+              <div
+                key={passage.label}
+                className="mt-4 border-t-2 border-dashed border-primary/15 pt-4"
+              >
+                <div className="flex flex-wrap items-center gap-2">
+                  <h4 className="font-heading text-base font-bold text-primary">
+                    {passage.label}
+                  </h4>
+                  {passage.when ? (
+                    <span className="rounded-full bg-accent/30 px-2.5 py-0.5 text-xs font-bold text-accent-foreground">
+                      {passage.when}
+                    </span>
+                  ) : null}
+                </div>
+                <p className="mt-2 font-heading text-lg font-bold leading-relaxed text-foreground">
+                  {passage.say}
+                </p>
+                <p className="mt-1 text-sm italic leading-relaxed text-muted-foreground">
+                  {passage.meaning}
+                </p>
+              </div>
+            ))}
           </div>
 
           <div className="flex gap-3 rounded-3xl bg-accent/20 p-5">
