@@ -1,6 +1,17 @@
 import Image from 'next/image'
-import { Droplets, MapPin, Shirt, Sparkles, Play } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import {
+  Droplets,
+  MapPin,
+  Shirt,
+  Sparkles,
+  Sunrise,
+  Sun,
+  CloudSun,
+  Sunset,
+  Moon,
+  ChevronRight,
+} from 'lucide-react'
+import { prayers, type Prayer } from '@/lib/salat-steps'
 
 const checklist = [
   {
@@ -20,7 +31,19 @@ const checklist = [
   },
 ]
 
-export function Welcome({ onStart }: { onStart: () => void }) {
+const prayerIcons = {
+  sunrise: Sunrise,
+  sun: Sun,
+  'cloud-sun': CloudSun,
+  sunset: Sunset,
+  moon: Moon,
+} as const
+
+export function Welcome({
+  onSelectPrayer,
+}: {
+  onSelectPrayer: (prayer: Prayer) => void
+}) {
   return (
     <section className="mx-auto flex max-w-5xl flex-col items-center gap-10 px-5 py-10 md:py-16">
       <div className="grid w-full items-center gap-8 md:grid-cols-2 md:gap-10">
@@ -34,17 +57,9 @@ export function Welcome({ onStart }: { onStart: () => void }) {
             <span className="text-primary">Salah</span>
           </h1>
           <p className="mt-4 max-w-md text-pretty text-lg leading-relaxed text-muted-foreground">
-            Salah is the special way we talk to Allah every day. We will learn it
-            one happy step at a time. Are you ready?
+            Salah is the special way we talk to Allah every day. Pick the prayer
+            you want to learn, and we will walk through every rakah together.
           </p>
-          <Button
-            onClick={onStart}
-            size="lg"
-            className="mt-7 h-14 rounded-full px-8 text-lg font-bold shadow-lg shadow-primary/20 transition-transform hover:scale-105"
-          >
-            <Play className="size-5 fill-current" aria-hidden="true" />
-            Start Learning
-          </Button>
         </div>
 
         <div className="order-1 md:order-2">
@@ -61,6 +76,68 @@ export function Welcome({ onStart }: { onStart: () => void }) {
         </div>
       </div>
 
+      {/* Prayer picker */}
+      <div className="w-full rounded-[2rem] border border-border bg-card p-6 shadow-sm sm:p-8">
+        <h2 className="text-center font-heading text-2xl font-extrabold text-foreground">
+          Which prayer are you learning?
+        </h2>
+        <p className="mt-1 text-center text-sm text-muted-foreground">
+          Tap a prayer to begin. Each one has its own number of rakahs.
+        </p>
+
+        <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {prayers.map((prayer) => {
+            const Icon = prayerIcons[prayer.icon]
+            return (
+              <li key={prayer.id}>
+                <button
+                  type="button"
+                  onClick={() => onSelectPrayer(prayer)}
+                  className="group flex h-full w-full flex-col items-start gap-3 rounded-3xl border-2 border-border bg-secondary/40 p-5 text-left transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:bg-secondary/70 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/20"
+                >
+                  <div className="flex w-full items-center justify-between">
+                    <span className="flex size-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                      <Icon className="size-6" aria-hidden="true" />
+                    </span>
+                    <span
+                      className="font-heading text-2xl text-primary/70"
+                      lang="ar"
+                      dir="rtl"
+                    >
+                      {prayer.arabic}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="font-heading text-xl font-extrabold text-foreground">
+                      {prayer.name}
+                    </span>
+                    <span className="ml-2 text-sm font-semibold text-muted-foreground">
+                      {prayer.time}
+                    </span>
+                  </div>
+                  <p className="text-sm leading-relaxed text-muted-foreground">
+                    {prayer.blurb}
+                  </p>
+                  <div className="mt-auto flex w-full items-center justify-between pt-2">
+                    <span className="rounded-full bg-accent/40 px-3 py-1 text-xs font-bold text-accent-foreground">
+                      {`${prayer.rakahs} rakahs`}
+                    </span>
+                    <span className="flex items-center gap-1 text-sm font-bold text-primary">
+                      Start
+                      <ChevronRight
+                        className="size-4 transition-transform group-hover:translate-x-0.5"
+                        aria-hidden="true"
+                      />
+                    </span>
+                  </div>
+                </button>
+              </li>
+            )
+          })}
+        </ul>
+      </div>
+
+      {/* Pre-prayer checklist */}
       <div className="w-full rounded-[2rem] border border-border bg-card p-6 shadow-sm sm:p-8">
         <h2 className="text-center font-heading text-xl font-bold text-foreground">
           Three things to do before we start

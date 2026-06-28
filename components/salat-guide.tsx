@@ -1,9 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { ArrowLeft, ArrowRight, Moon, Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { salatSteps } from '@/lib/salat-steps'
+import { buildSalatSteps, type Prayer } from '@/lib/salat-steps'
 import { Welcome } from '@/components/welcome'
 import { StepProgress } from '@/components/step-progress'
 import { LessonStep } from '@/components/lesson-step'
@@ -13,9 +13,22 @@ type Stage = 'welcome' | 'lesson' | 'finished'
 
 export function SalatGuide() {
   const [stage, setStage] = useState<Stage>('welcome')
+  const [prayer, setPrayer] = useState<Prayer | null>(null)
   const [index, setIndex] = useState(0)
 
-  const isLastStep = index === salatSteps.length - 1
+  const steps = useMemo(
+    () => (prayer ? buildSalatSteps(prayer) : []),
+    [prayer],
+  )
+
+  const isLastStep = index === steps.length - 1
+
+  function startPrayer(chosen: Prayer) {
+    setPrayer(chosen)
+    setIndex(0)
+    setStage('lesson')
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
 
   function goNext() {
     if (isLastStep) {
@@ -23,14 +36,15 @@ export function SalatGuide() {
       window.scrollTo({ top: 0, behavior: 'smooth' })
       return
     }
-    setIndex((i) => Math.min(i + 1, salatSteps.length - 1))
+    setIndex((i) => Math.min(i + 1, steps.length - 1))
   }
 
   function goBack() {
     setIndex((i) => Math.max(i - 1, 0))
   }
 
-  function restart() {
+  function chooseAnother() {
+    setPrayer(null)
     setIndex(0)
     setStage('welcome')
     window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -48,33 +62,32 @@ export function SalatGuide() {
               My First Salah
             </span>
           </div>
-          {stage === 'lesson' && (
+          {stage === 'lesson' && prayer && (
             <button
               type="button"
-              onClick={restart}
+              onClick={chooseAnother}
               className="rounded-full px-3 py-1.5 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
             >
-              Start over
+              Change prayer
             </button>
           )}
         </div>
       </header>
 
       <main className="flex-1">
-        {stage === 'welcome' && (
-          <Welcome onStart={() => setStage('lesson')} />
-        )}
+        {stage === 'welcome' && <Welcome onSelectPrayer={startPrayer} />}
 
-        {stage === 'lesson' && (
+        {stage === 'lesson' && prayer && (
           <section className="mx-auto max-w-4xl px-5 py-8 md:py-10">
             <StepProgress
-              steps={salatSteps}
+              steps={steps}
+              prayer={prayer}
               currentIndex={index}
               onSelect={setIndex}
             />
 
             <div className="mt-8 rounded-[2rem] border border-border bg-card p-5 shadow-sm sm:p-8">
-              <LessonStep step={salatSteps[index]} />
+              <LessonStep step={steps[index]} />
             </div>
 
             <div className="mt-6 flex items-center justify-between gap-4">
@@ -110,8 +123,13 @@ export function SalatGuide() {
           </section>
         )}
 
-        {stage === 'finished' && (
-          <Finished steps={salatSteps} onRestart={restart} />
+        {stage === 'finished' && prayer && (
+          <Finished
+            steps={steps}
+            prayer={prayer}
+            onRestart={() => startPrayer(prayer)}
+            onChooseAnother={chooseAnother}
+          />
         )}
       </main>
 

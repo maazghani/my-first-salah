@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import { Footprints, MessageCircleHeart, Lightbulb } from 'lucide-react'
+import { Footprints, MessageCircleHeart, Lightbulb, MapPin } from 'lucide-react'
 import type { SalatStep } from '@/lib/salat-steps'
 
 export function LessonStep({ step }: { step: SalatStep }) {
@@ -22,6 +22,10 @@ export function LessonStep({ step }: { step: SalatStep }) {
       </div>
 
       <div className="flex flex-col">
+        <span className="mb-3 inline-flex w-fit items-center gap-1.5 rounded-full bg-accent/40 px-3 py-1 text-xs font-bold text-accent-foreground">
+          <MapPin className="size-3.5" aria-hidden="true" />
+          {step.context}
+        </span>
         <div className="flex items-center justify-between gap-3">
           <div>
             <h2 className="font-heading text-3xl font-extrabold leading-none text-foreground">
