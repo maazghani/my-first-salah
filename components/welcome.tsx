@@ -1,4 +1,5 @@
 import Image from 'next/image'
+import Link from 'next/link'
 import {
   Droplets,
   MapPin,
@@ -18,6 +19,8 @@ const checklist = [
     icon: Droplets,
     title: 'Make Wudu',
     text: 'Wash up so you are fresh and clean.',
+    href: '/wudu',
+    cta: 'Learn how',
   },
   {
     icon: Shirt,
@@ -29,7 +32,7 @@ const checklist = [
     title: 'Face the Qiblah',
     text: 'Point yourself toward the Kaaba.',
   },
-]
+] as const
 
 const prayerIcons = {
   sunrise: Sunrise,
@@ -143,22 +146,52 @@ export function Welcome({
           Three things to do before we start
         </h2>
         <ul className="mt-6 grid gap-4 sm:grid-cols-3">
-          {checklist.map((item) => (
-            <li
-              key={item.title}
-              className="flex flex-col items-center gap-3 rounded-3xl bg-secondary/60 p-5 text-center"
-            >
-              <span className="flex size-14 items-center justify-center rounded-full bg-primary/10 text-primary">
-                <item.icon className="size-7" aria-hidden="true" />
-              </span>
-              <span className="font-heading text-lg font-bold text-foreground">
-                {item.title}
-              </span>
-              <span className="text-sm leading-relaxed text-muted-foreground">
-                {item.text}
-              </span>
-            </li>
-          ))}
+          {checklist.map((item) => {
+            const inner = (
+              <>
+                <span className="flex size-14 items-center justify-center rounded-full bg-primary/10 text-primary">
+                  <item.icon className="size-7" aria-hidden="true" />
+                </span>
+                <span className="font-heading text-lg font-bold text-foreground">
+                  {item.title}
+                </span>
+                <span className="text-sm leading-relaxed text-muted-foreground">
+                  {item.text}
+                </span>
+                {'href' in item && item.href ? (
+                  <span className="mt-auto flex items-center gap-1 pt-1 text-sm font-bold text-primary">
+                    {item.cta}
+                    <ChevronRight
+                      className="size-4 transition-transform group-hover:translate-x-0.5"
+                      aria-hidden="true"
+                    />
+                  </span>
+                ) : null}
+              </>
+            )
+
+            if ('href' in item && item.href) {
+              return (
+                <li key={item.title}>
+                  <Link
+                    href={item.href}
+                    className="group flex h-full flex-col items-center gap-3 rounded-3xl border-2 border-primary/20 bg-secondary/60 p-5 text-center transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:bg-secondary/80 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/20"
+                  >
+                    {inner}
+                  </Link>
+                </li>
+              )
+            }
+
+            return (
+              <li
+                key={item.title}
+                className="flex flex-col items-center gap-3 rounded-3xl bg-secondary/60 p-5 text-center"
+              >
+                {inner}
+              </li>
+            )
+          })}
         </ul>
       </div>
     </section>
