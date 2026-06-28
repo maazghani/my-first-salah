@@ -1,7 +1,14 @@
 'use client'
 
-import { useMemo, useState } from 'react'
-import { ArrowLeft, ArrowRight, Moon, Check } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+import {
+  ArrowLeft,
+  ArrowRight,
+  Check,
+  Moon,
+  RefreshCcw,
+  Sun,
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { buildSalatSteps, type Prayer } from '@/lib/salat-steps'
 import { Welcome } from '@/components/welcome'
@@ -11,10 +18,22 @@ import { Finished } from '@/components/finished'
 
 type Stage = 'welcome' | 'lesson' | 'finished'
 
+const themeStorageKey = 'my-first-salah-theme'
+const latteTheme = 'latte'
+const frappeTheme = 'frappe'
+
+function applyFrappeTheme(useFrappeTheme: boolean) {
+  const root = document.documentElement
+
+  root.classList.toggle('dark', useFrappeTheme)
+  root.dataset.theme = useFrappeTheme ? frappeTheme : latteTheme
+}
+
 export function SalatGuide() {
   const [stage, setStage] = useState<Stage>('welcome')
   const [prayer, setPrayer] = useState<Prayer | null>(null)
   const [index, setIndex] = useState(0)
+  const [usesFrappeTheme, setUsesFrappeTheme] = useState(false)
 
   const steps = useMemo(
     () => (prayer ? buildSalatSteps(prayer) : []),
@@ -22,6 +41,17 @@ export function SalatGuide() {
   )
 
   const isLastStep = index === steps.length - 1
+  const themeLabel = usesFrappeTheme
+    ? 'Use Catppuccin Latte light theme'
+    : 'Use Catppuccin Frappe dark theme'
+
+  useEffect(() => {
+    const storedTheme = window.localStorage.getItem(themeStorageKey)
+    const shouldUseFrappe = storedTheme === frappeTheme
+
+    applyFrappeTheme(shouldUseFrappe)
+    setUsesFrappeTheme(shouldUseFrappe)
+  }, [])
 
   function startPrayer(chosen: Prayer) {
     setPrayer(chosen)
@@ -50,6 +80,25 @@ export function SalatGuide() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
+  function toggleTheme() {
+    setUsesFrappeTheme((current) => {
+      const next = !current
+
+      applyFrappeTheme(next)
+
+      try {
+        window.localStorage.setItem(
+          themeStorageKey,
+          next ? frappeTheme : latteTheme,
+        )
+      } catch {
+        // The visual theme should still switch if storage is unavailable.
+      }
+
+      return next
+    })
+  }
+
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <header className="border-b border-border bg-card/70 backdrop-blur-sm">
@@ -62,15 +111,34 @@ export function SalatGuide() {
               My First Salah
             </span>
           </div>
-          {stage === 'lesson' && prayer && (
+          <div className="flex items-center gap-2">
             <button
               type="button"
-              onClick={chooseAnother}
-              className="rounded-full px-3 py-1.5 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+              onClick={toggleTheme}
+              aria-label={themeLabel}
+              aria-pressed={usesFrappeTheme}
+              title={themeLabel}
+              className="flex size-10 items-center justify-center rounded-full border border-border bg-secondary/60 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/20"
             >
-              Change prayer
+              {usesFrappeTheme ? (
+                <Sun className="size-5" aria-hidden="true" />
+              ) : (
+                <Moon className="size-5" aria-hidden="true" />
+              )}
             </button>
-          )}
+            {stage === 'lesson' && prayer && (
+              <button
+                type="button"
+                onClick={chooseAnother}
+                aria-label="Change prayer"
+                title="Change prayer"
+                className="flex size-10 items-center justify-center rounded-full px-0 text-sm font-bold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/20 sm:w-auto sm:px-3 sm:py-1.5"
+              >
+                <RefreshCcw className="size-4 sm:hidden" aria-hidden="true" />
+                <span className="hidden sm:inline">Change prayer</span>
+              </button>
+            )}
+          </div>
         </div>
       </header>
 

@@ -1,6 +1,7 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
 import { Baloo_2, Nunito } from 'next/font/google'
+import Script from 'next/script'
 import './globals.css'
 
 const baloo = Baloo_2({
@@ -39,9 +40,26 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  colorScheme: 'light',
-  themeColor: '#0d9488',
+  colorScheme: 'light dark',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#179299' },
+    { media: '(prefers-color-scheme: dark)', color: '#303446' },
+  ],
 }
+
+const themeInitScript = `
+(() => {
+  try {
+    const storageKey = 'my-first-salah-theme';
+    const storedTheme = window.localStorage.getItem(storageKey);
+    const useFrappe = storedTheme === 'frappe';
+    document.documentElement.classList.toggle('dark', useFrappe);
+    document.documentElement.dataset.theme = useFrappe ? 'frappe' : 'latte';
+  } catch {
+    document.documentElement.dataset.theme = 'latte';
+  }
+})();
+`
 
 export default function RootLayout({
   children,
@@ -52,8 +70,14 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${baloo.variable} ${nunito.variable} bg-background`}
+      suppressHydrationWarning
     >
       <body className="font-sans antialiased">
+        <Script
+          id="theme-init"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{ __html: themeInitScript }}
+        />
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
